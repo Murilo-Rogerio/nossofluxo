@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Activity, AlertTriangle, CheckCircle2, ShieldCheck, TrendingUp } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { formatBRL, formatPct } from '@/lib/format'
+import { formatBRL } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
 interface FinancialHealthProps {
@@ -19,10 +19,11 @@ export function FinancialHealth({
   balance,
   billsTotal,
 }: FinancialHealthProps) {
-  // Cálculo da taxa de poupança
+  // Cálculo da taxa de poupança e comprometimento
   const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0
   const expenseRate = totalIncome > 0 ? Math.round((totalExpense / totalIncome) * 100) : 0
   const fixedRate = totalIncome > 0 ? Math.round((billsTotal / totalIncome) * 100) : 0
+  const variableRate = Math.max(0, expenseRate - fixedRate)
 
   // Diagnóstico
   let score = 50
@@ -75,32 +76,32 @@ export function FinancialHealth({
       transition={{ duration: 0.3, delay: 0.1 }}
     >
       <Card className="relative overflow-hidden border-white/10 p-5 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className={cn('flex h-9 w-9 items-center justify-center rounded-xl border', badgeBorder, color)}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm', badgeBorder, color)}>
               <Icon className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-                Saúde Financeira
-                <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-medium', badgeBorder, color)}>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-sm font-semibold text-slate-100">Saúde Financeira</h2>
+                <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide', badgeBorder, color)}>
                   {status} · {score}/100
                 </span>
-              </h2>
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">{message}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4 self-end sm:self-auto text-xs pt-1 sm:pt-0">
             <div className="text-right">
-              <p className="text-slate-400">Taxa de Poupança</p>
+              <p className="text-slate-400 text-[11px]">Taxa de Poupança</p>
               <p className={cn('text-sm font-bold tabular-nums', color)}>
                 {savingsRate > 0 ? `+${savingsRate}%` : `${savingsRate}%`}
               </p>
             </div>
-            <div className="h-8 w-px bg-white/10" />
+            <div className="h-7 w-px bg-white/10" />
             <div className="text-right">
-              <p className="text-slate-400">Comprometido</p>
+              <p className="text-slate-400 text-[11px]">Comprometido</p>
               <p className="text-sm font-bold tabular-nums text-slate-200">
                 {expenseRate}%
               </p>
@@ -108,45 +109,63 @@ export function FinancialHealth({
           </div>
         </div>
 
-        {/* Barra de Distribuição */}
+        {/* Barra de Distribuição das Receitas */}
         <div className="mt-4">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800 flex">
-            {totalIncome > 0 && (
-              <>
-                <div
-                  className="bg-indigo-500 h-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, fixedRate)}%` }}
-                  title={`Contas fixas: ${fixedRate}%`}
-                />
-                <div
-                  className="bg-rose-500 h-full transition-all duration-500"
-                  style={{ width: `${Math.max(0, Math.min(100, expenseRate - fixedRate))}%` }}
-                  title={`Outros gastos: ${Math.max(0, expenseRate - fixedRate)}%`}
-                />
-                <div
-                  className="bg-emerald-500 h-full transition-all duration-500"
-                  style={{ width: `${Math.max(0, savingsRate)}%` }}
-                  title={`Sobra/Poupança: ${savingsRate}%`}
-                />
-              </>
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-800 flex">
+            {totalIncome > 0 ? (
+              balance >= 0 ? (
+                <>
+                  <div
+                    className="bg-indigo-500 h-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, fixedRate)}%` }}
+                    title={`Contas fixas: ${fixedRate}%`}
+                  />
+                  <div
+                    className="bg-sky-400 h-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, variableRate)}%` }}
+                    title={`Gastos livres: ${variableRate}%`}
+                  />
+                  <div
+                    className="bg-emerald-400 h-full transition-all duration-500"
+                    style={{ width: `${Math.max(0, savingsRate)}%` }}
+                    title={`Sobra/Poupança: ${savingsRate}%`}
+                  />
+                </>
+              ) : (
+                <>
+                  <div
+                    className="bg-indigo-500 h-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, fixedRate)}%` }}
+                    title={`Contas fixas: ${fixedRate}%`}
+                  />
+                  <div
+                    className="bg-rose-500 h-full transition-all duration-500"
+                    style={{ width: `${Math.max(0, 100 - fixedRate)}%` }}
+                    title="Déficit de gastos"
+                  />
+                </>
+              )
+            ) : (
+              <div className="bg-slate-700 h-full w-full" />
             )}
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-between text-[11px] text-slate-400">
-            <div className="flex items-center gap-4">
+
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="flex items-center gap-1.5">
                 <i className="h-2 w-2 rounded-full bg-indigo-500" />
                 Contas fixas ({fixedRate}%)
               </span>
               <span className="flex items-center gap-1.5">
-                <i className="h-2 w-2 rounded-full bg-rose-500" />
-                Gastos livres ({Math.max(0, expenseRate - fixedRate)}%)
+                <i className={cn('h-2 w-2 rounded-full', balance >= 0 ? 'bg-sky-400' : 'bg-rose-500')} />
+                Gastos livres ({variableRate}%)
               </span>
               <span className="flex items-center gap-1.5">
-                <i className="h-2 w-2 rounded-full bg-emerald-500" />
+                <i className="h-2 w-2 rounded-full bg-emerald-400" />
                 Sobra ({Math.max(0, savingsRate)}%)
               </span>
             </div>
-            <span>Regra 50/30/20 de referência</span>
+            <span className="text-slate-500">Regra 50/30/20</span>
           </div>
         </div>
       </Card>

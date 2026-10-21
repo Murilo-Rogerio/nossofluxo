@@ -1,6 +1,6 @@
 'use client'
 
-import { PieChart as PieChartIcon, Wallet } from 'lucide-react'
+import { PieChart as PieChartIcon } from 'lucide-react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { EmptyState } from '@/components/ui/empty-state'
 import { formatBRL } from '@/lib/format'
@@ -17,8 +17,11 @@ export function CategoryDonut({ data }: { data: DonutDatum[] }) {
 
   if (!data.length || total <= 0) {
     return (
-      <EmptyState icon={PieChartIcon} title="Sem gastos neste mês"
-        description="Os gastos aparecerão aqui, divididos por categoria, assim que você registrá-los." />
+      <EmptyState
+        icon={PieChartIcon}
+        title="Sem gastos neste mês"
+        description="Os gastos aparecerão aqui, divididos por categoria, assim que você registrá-los."
+      />
     )
   }
 
@@ -27,10 +30,20 @@ export function CategoryDonut({ data }: { data: DonutDatum[] }) {
       <div className="h-44 w-44 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name"
-              innerRadius={54} outerRadius={80} paddingAngle={3} stroke="none"
-              startAngle={90} endAngle={-270}>
-              {data.map(d => <Cell key={d.name} fill={d.color} />)}
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={54}
+              outerRadius={80}
+              paddingAngle={3}
+              stroke="none"
+              startAngle={90}
+              endAngle={-270}
+            >
+              {data.map(d => (
+                <Cell key={d.name} fill={d.color} />
+              ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -39,11 +52,11 @@ export function CategoryDonut({ data }: { data: DonutDatum[] }) {
       <ul className="w-full space-y-2.5">
         {data.map(d => (
           <li key={d.name} className="flex items-center justify-between gap-3 text-xs">
-            <span className="flex items-center gap-2 text-slate-300">
+            <span className="flex items-center gap-2 text-slate-300 min-w-0">
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
-              {d.name}
+              <span className="truncate">{d.name}</span>
             </span>
-            <span className="tabular-nums text-slate-500">
+            <span className="tabular-nums text-slate-400 shrink-0 whitespace-nowrap">
               {formatBRL(d.value)} · {Math.round((d.value / total) * 100)}%
             </span>
           </li>

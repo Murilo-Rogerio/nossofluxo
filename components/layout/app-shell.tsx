@@ -11,7 +11,6 @@ import {
   LogOut,
   PiggyBank,
   TrendingUp,
-  Sparkles,
 } from 'lucide-react'
 import { signOut } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -43,8 +42,8 @@ export function AppShell({ email, children }: { email: string; children: ReactNo
         <div className="absolute -bottom-24 right-[10%] h-96 w-96 rounded-full bg-indigo-500/[0.05] blur-[130px]" />
       </div>
 
-      {/* ── Sidebar (desktop: ≥1024px) ── */}
-      <aside className="desktop-only fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-white/5 bg-card/60 backdrop-blur-xl">
+      {/* ── Sidebar Desktop (≥1024px) ── */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-card/60 backdrop-blur-xl lg:flex">
         {/* Header da Sidebar */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-white/5">
           <Link href="/dashboard" className="flex items-center gap-2.5 group">
@@ -54,7 +53,7 @@ export function AppShell({ email, children }: { email: string; children: ReactNo
             <div>
               <div className="flex items-center gap-1.5">
                 <p className="text-sm font-bold tracking-tight text-slate-100">Cofre</p>
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" title="Sincronizado" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" title="Online" />
               </div>
               <p className="text-[11px] text-slate-500">finanças pessoais</p>
             </div>
@@ -159,8 +158,8 @@ export function AppShell({ email, children }: { email: string; children: ReactNo
         </div>
       </aside>
 
-      {/* ── Header Mobile (telas <1024px) ── */}
-      <header className="mobile-only sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-card/85 px-4 py-3 backdrop-blur-xl">
+      {/* ── Header Mobile (<1024px) ── */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-card/85 px-4 py-3 backdrop-blur-xl lg:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <PiggyBank className="h-4 w-4" />
@@ -170,40 +169,26 @@ export function AppShell({ email, children }: { email: string; children: ReactNo
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           </div>
         </Link>
-        <div className="flex items-center gap-1">
-          <Link
-            href="/integracoes"
-            className={cn(
-              'rounded-lg p-2 text-xs transition-colors',
-              isActive('/integracoes')
-                ? 'bg-indigo-500/15 text-indigo-300'
-                : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100',
-            )}
-            title="Conexões bancárias"
+        <form action={signOut}>
+          <button
+            type="submit"
+            aria-label="Sair da conta"
+            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
           >
-            <Landmark className="h-4 w-4" />
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              aria-label="Sair da conta"
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
+            <LogOut className="h-5 w-5" />
+          </button>
+        </form>
       </header>
 
       {/* ── Área Principal de Conteúdo ── */}
-      <div className="app-content flex-1">
-        <main className="app-main mx-auto w-full max-w-6xl px-4 pt-6 pb-28 lg:pb-12 sm:px-6">
+      <div className="flex-1 lg:pl-64">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-32 sm:px-6 lg:pb-12">
           {children}
         </main>
       </div>
 
-      {/* ── Navbar Mobile Inferior: Fixa, garantida, segura e moderna ── */}
-      <nav className="mobile-only fixed bottom-0 inset-x-0 z-50 grid grid-cols-5 border-t border-white/10 bg-slate-950/90 backdrop-blur-xl shadow-2xl pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-1.5">
+      {/* ── Navbar Mobile Inferior: Fixa, perfeitamente espaçada com 20% para cada aba ── */}
+      <nav className="fixed bottom-0 inset-x-0 z-50 flex items-center justify-around border-t border-white/10 bg-slate-950/95 backdrop-blur-xl px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden shadow-2xl">
         {MAIN_NAV.map(item => {
           const active = isActive(item.href)
           return (
@@ -211,22 +196,24 @@ export function AppShell({ email, children }: { email: string; children: ReactNo
               key={item.href}
               href={item.href}
               className={cn(
-                'relative flex flex-col items-center gap-1 py-1 text-[10px] font-medium transition-all duration-150',
+                'flex flex-1 flex-col items-center justify-center gap-1 py-1 text-center transition-colors min-w-0',
                 active ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200',
               )}
             >
-              {active && (
-                <span className="absolute -top-1.5 h-0.5 w-7 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-              )}
+              <item.icon
+                className={cn(
+                  'h-5 w-5 transition-transform duration-150',
+                  active ? 'scale-110 text-emerald-400' : 'text-slate-400',
+                )}
+              />
               <span
                 className={cn(
-                  'flex h-7 w-7 items-center justify-center rounded-lg transition-colors',
-                  active ? 'bg-emerald-500/15 text-emerald-400' : '',
+                  'text-[10px] tracking-tight leading-none truncate max-w-[56px]',
+                  active ? 'font-semibold text-emerald-400' : 'text-slate-400',
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                {item.short}
               </span>
-              <span>{item.short}</span>
             </Link>
           )
         })}
