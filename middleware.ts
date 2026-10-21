@@ -49,12 +49,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`))
 
-  if (!authenticated && !isPublic) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Redireciona usuário autenticado na raiz ou no login direto para o dashboard
+  if (authenticated && (pathname === '/login' || pathname === '/')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  if (authenticated && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Redireciona usuário não autenticado em rotas privadas para o login
+  if (!authenticated && !isPublic) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return response

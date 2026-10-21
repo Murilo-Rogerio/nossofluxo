@@ -21,16 +21,13 @@
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
 
-/* ── Shell: layout por LARGURA + APONTADOR ──
-   Ao restaurar aba, o Chromium pode reportar viewport de desktop (≥1024px)
-   no celular (zoom por site ou flag de "site para desktop"), ativando o layout
-   lg: e "sumindo" com a navbar mobile. Com (pointer: fine), o layout desktop
-   exige mouse: celular (dedo) sempre recebe o chrome mobile. */
+/* ── Shell: layout responsivo adaptável e robusto ── */
 .desktop-only { display: none; }
+.mobile-only { display: flex; }
 
-@media (min-width: 1024px) and (pointer: fine) {
+@media (min-width: 1024px) {
   .desktop-only { display: flex; }
-  .mobile-only { display: none; }
+  .mobile-only { display: none !important; }
   .app-content { padding-left: 16rem; }
   .app-main { padding-bottom: 3rem; }
 }

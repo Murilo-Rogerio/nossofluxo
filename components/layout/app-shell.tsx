@@ -3,12 +3,21 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CreditCard, LayoutDashboard, LineChart, LogOut, PiggyBank, TrendingUp } from 'lucide-react'
+import {
+  CreditCard,
+  Landmark,
+  LayoutDashboard,
+  LineChart,
+  LogOut,
+  PiggyBank,
+  TrendingUp,
+  Sparkles,
+} from 'lucide-react'
 import { signOut } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
 
-const NAV = [
+const MAIN_NAV = [
   { href: '/dashboard', label: 'Dashboard', short: 'Início', icon: LayoutDashboard },
   { href: '/entradas', label: 'Entradas', short: 'Entradas', icon: TrendingUp },
   { href: '/gastos', label: 'Gastos', short: 'Gastos', icon: CreditCard },
@@ -16,96 +25,211 @@ const NAV = [
   { href: '/patrimonio', label: 'Patrimônio', short: 'Cofrinho', icon: PiggyBank },
 ] as const
 
-/**
- * Layout do shell baseado em LARGURA + TIPO DE APONTADOR (ver globals.css):
- *  - desktop (≥1024px + mouse): sidebar fixa
- *  - celular (dedo, qualquer largura reportada): header + navbar inferior
- *    no fluxo (sticky), imune ao bug de restauração de aba do Chromium.
- */
+const SECONDARY_NAV = [
+  { href: '/integracoes', label: 'Open Finance', icon: Landmark },
+] as const
+
 export function AppShell({ email, children }: { email: string; children: ReactNode }) {
   const pathname = usePathname()
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
+  const initialLetter = email ? email.charAt(0).toUpperCase() : 'U'
+
   return (
-    <div className="flex min-h-dvh flex-col">
-      {/* Halos sutis de fundo */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -top-32 left-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.05] blur-[120px]" />
-        <div className="absolute -bottom-24 right-[10%] h-96 w-96 rounded-full bg-indigo-500/[0.06] blur-[130px]" />
+    <div className="relative flex min-h-dvh flex-col bg-base text-slate-100 selection:bg-emerald-500/20">
+      {/* Halos sutis de fundo decorativo */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 left-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.04] blur-[120px]" />
+        <div className="absolute -bottom-24 right-[10%] h-96 w-96 rounded-full bg-indigo-500/[0.05] blur-[130px]" />
       </div>
 
-      {/* ── Sidebar (desktop: largura + mouse) ── */}
-      <aside className="desktop-only fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-white/5 bg-card/50 backdrop-blur-xl">
-        <div className="flex items-center gap-2.5 px-5 py-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-            <PiggyBank className="h-5 w-5" />
-          </span>
+      {/* ── Sidebar (desktop: ≥1024px) ── */}
+      <aside className="desktop-only fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-white/5 bg-card/60 backdrop-blur-xl">
+        {/* Header da Sidebar */}
+        <div className="flex items-center justify-between px-5 py-5 border-b border-white/5">
+          <Link href="/dashboard" className="flex items-center gap-2.5 group">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-950/50 group-hover:bg-emerald-500/20 transition-colors">
+              <PiggyBank className="h-5 w-5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm font-bold tracking-tight text-slate-100">Cofre</p>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" title="Sincronizado" />
+              </div>
+              <p className="text-[11px] text-slate-500">finanças pessoais</p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Links de navegação principal */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           <div>
-            <p className="text-sm font-semibold tracking-tight text-slate-100">Cofre</p>
-            <p className="text-[11px] text-slate-500">finanças pessoais</p>
+            <p className="px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Principal
+            </p>
+            <nav className="mt-2 space-y-1">
+              {MAIN_NAV.map(item => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                      active
+                        ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shadow-sm shadow-emerald-950/20'
+                        : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border border-transparent',
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        'h-4 w-4 transition-colors',
+                        active ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300',
+                      )}
+                    />
+                    <span>{item.label}</span>
+                    {active && (
+                      <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400" />
+                    )}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+
+          <div>
+            <p className="px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Conexões
+            </p>
+            <nav className="mt-2 space-y-1">
+              {SECONDARY_NAV.map(item => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                      active
+                        ? 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/25'
+                        : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border border-transparent',
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        'h-4 w-4 transition-colors',
+                        active ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300',
+                      )}
+                    />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </nav>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-2">
-          {NAV.map(item => (
-            <Link key={item.href} href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
-                isActive(item.href)
-                  ? 'bg-slate-800/60 font-medium text-slate-100'
-                  : 'text-slate-400 hover:bg-slate-800/30 hover:text-slate-200',
-              )}>
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="border-t border-white/5 p-4">
-          <p className="truncate text-xs text-slate-500" title={email}>{email}</p>
+        {/* Rodapé da Sidebar: Usuário + Logout */}
+        <div className="border-t border-white/5 p-4 bg-slate-950/20">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 border border-white/10 text-xs font-semibold text-emerald-400">
+              {initialLetter}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-medium text-slate-200" title={email}>
+                {email}
+              </p>
+              <p className="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                Conectado
+              </p>
+            </div>
+          </div>
           <form action={signOut}>
-            <Button variant="ghost" size="sm" className="mt-2 w-full justify-start gap-2">
-              <LogOut className="h-4 w-4" /> Sair
+            <Button
+              type="submit"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Sair da conta
             </Button>
           </form>
         </div>
       </aside>
 
-      {/* ── Header (mobile: apontador = dedo) ── */}
-      <header className="mobile-only sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-base/80 px-4 py-3 backdrop-blur-xl">
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+      {/* ── Header Mobile (telas <1024px) ── */}
+      <header className="mobile-only sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-card/85 px-4 py-3 backdrop-blur-xl">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <PiggyBank className="h-4 w-4" />
           </span>
-          <p className="text-sm font-semibold tracking-tight text-slate-100">Cofre</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-bold tracking-tight text-slate-100">Cofre</p>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
+        </Link>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/integracoes"
+            className={cn(
+              'rounded-lg p-2 text-xs transition-colors',
+              isActive('/integracoes')
+                ? 'bg-indigo-500/15 text-indigo-300'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100',
+            )}
+            title="Conexões bancárias"
+          >
+            <Landmark className="h-4 w-4" />
+          </Link>
+          <form action={signOut}>
+            <button
+              type="submit"
+              aria-label="Sair da conta"
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </form>
         </div>
-        <form action={signOut}>
-          <button type="submit" aria-label="Sair"
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-100">
-            <LogOut className="h-5 w-5" />
-          </button>
-        </form>
       </header>
 
-      {/* ── Conteúdo (flex-1 ancora a navbar no rodapé em páginas curtas) ── */}
+      {/* ── Área Principal de Conteúdo ── */}
       <div className="app-content flex-1">
-        <main className="app-main mx-auto w-full max-w-6xl px-4 pb-4 pt-6 sm:px-6">
+        <main className="app-main mx-auto w-full max-w-6xl px-4 pt-6 pb-28 lg:pb-12 sm:px-6">
           {children}
         </main>
       </div>
 
-      {/* ── Navbar mobile: sticky NO FLUXO, sempre presente no celular ── */}
-      <nav className="mobile-only sticky bottom-0 z-40 grid grid-cols-5 border-t border-white/5 bg-card pb-[env(safe-area-inset-bottom)]">
-        {NAV.map(item => (
-          <Link key={item.href} href={item.href}
-            className={cn(
-              'flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors',
-              isActive(item.href) ? 'text-emerald-400' : 'text-slate-500',
-            )}>
-            <item.icon className="h-5 w-5" />
-            {item.short}
-          </Link>
-        ))}
+      {/* ── Navbar Mobile Inferior: Fixa, garantida, segura e moderna ── */}
+      <nav className="mobile-only fixed bottom-0 inset-x-0 z-50 grid grid-cols-5 border-t border-white/10 bg-slate-950/90 backdrop-blur-xl shadow-2xl pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-1.5">
+        {MAIN_NAV.map(item => {
+          const active = isActive(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'relative flex flex-col items-center gap-1 py-1 text-[10px] font-medium transition-all duration-150',
+                active ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200',
+              )}
+            >
+              {active && (
+                <span className="absolute -top-1.5 h-0.5 w-7 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+              )}
+              <span
+                className={cn(
+                  'flex h-7 w-7 items-center justify-center rounded-lg transition-colors',
+                  active ? 'bg-emerald-500/15 text-emerald-400' : '',
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+              </span>
+              <span>{item.short}</span>
+            </Link>
+          )
+        })}
       </nav>
     </div>
   )

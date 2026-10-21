@@ -6,6 +6,7 @@ import { StatCard } from '@/components/ui/stat-card'
 import { CategoryManager } from '@/components/categories/category-manager'
 import { ExpenseFormCard } from '@/components/expenses/expense-form-card'
 import { ExpenseList } from '@/components/expenses/expense-list'
+import { ExportDataButton } from '@/components/dashboard/export-data-button'
 import { getMonthlyOverview } from '@/lib/data'
 import { currentMonthKey, isValidMonthKey, monthTitle } from '@/lib/date'
 import { formatBRL } from '@/lib/format'
@@ -23,7 +24,7 @@ export default async function ExpensesPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-slate-100">Gastos</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-100">Gastos</h1>
           <p className="mt-0.5 text-sm text-slate-500">{monthTitle(monthKey)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -32,6 +33,12 @@ export default async function ExpensesPage({ searchParams }: PageProps) {
               <Sparkles className="h-3 w-3" />Projeção
             </span>
           )}
+          <ExportDataButton
+            monthKey={monthKey}
+            incomeItems={overview.incomeItems}
+            expenseItems={overview.expenseItems}
+            customCategories={overview.customCategories}
+          />
           <CategoryManager categories={overview.customCategories} />
           <MonthPicker monthKey={monthKey} />
         </div>
@@ -52,9 +59,11 @@ export default async function ExpensesPage({ searchParams }: PageProps) {
 
       <ExpenseFormCard customCategories={overview.customCategories} />
 
-      <Card>
-        <h2 className="px-5 pt-5 text-sm font-semibold text-slate-200">Gastos do mês</h2>
-        <div className="mt-3">
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-1">
+          <h2 className="text-sm font-semibold text-slate-200">Gastos do mês</h2>
+        </div>
+        <div className="mt-2">
           <ExpenseList items={overview.expenseItems} customCategories={overview.customCategories} />
         </div>
       </Card>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Sparkles } from 'lucide-react'
+import { ArrowUpRight, Sparkles } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { MonthPicker } from '@/components/ui/month-picker'
 import { StatCard } from '@/components/ui/stat-card'
@@ -8,6 +8,8 @@ import { FlowChart } from '@/components/dashboard/flow-chart'
 import { CategoryDonut } from '@/components/dashboard/category-donut'
 import { RecentList } from '@/components/dashboard/recent-list'
 import { RecurringPanels } from '@/components/dashboard/recurring-panels'
+import { FinancialHealth } from '@/components/dashboard/financial-health'
+import { ExportDataButton } from '@/components/dashboard/export-data-button'
 import { CategoryManager } from '@/components/categories/category-manager'
 import { getFlowHistory, getMonthlyOverview } from '@/lib/data'
 import { resolveCategory } from '@/lib/categories'
@@ -90,7 +92,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-slate-100">Visão geral</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-100">Visão geral</h1>
           <p className="mt-0.5 text-sm text-slate-500">{monthTitle(monthKey)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -99,6 +101,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               <Sparkles className="h-3 w-3" />Projeção
             </span>
           )}
+          <ExportDataButton
+            monthKey={monthKey}
+            incomeItems={overview.incomeItems}
+            expenseItems={overview.expenseItems}
+            customCategories={overview.customCategories}
+          />
           <CategoryManager categories={overview.customCategories} />
           <MonthPicker monthKey={monthKey} />
         </div>
@@ -127,6 +135,14 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           icon="savings" tone="bg-indigo-500/10 text-indigo-400" delay={0.15} />
       </div>
 
+      {/* Widget de Saúde Financeira */}
+      <FinancialHealth
+        totalIncome={overview.totalIncome}
+        totalExpense={overview.totalExpense}
+        balance={overview.balance}
+        billsTotal={billsTotal}
+      />
+
       {/* Gráficos */}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5 lg:col-span-2">
@@ -141,7 +157,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           <div className="mt-4">
             <FlowChart data={flow} />
           </div>
-          <p className="mt-2 text-[11px] text-slate-600">
+          <p className="mt-2 text-[11px] text-slate-500">
             CDI: rendimento mensal estimado com a taxa atual da BrasilAPI e o patrimônio registrado.
           </p>
         </Card>
@@ -170,11 +186,17 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
       {/* Movimentos recentes */}
       <Card className="p-0 pb-1">
-        <div className="flex items-center justify-between px-5 pt-5">
+        <div className="flex items-center justify-between px-5 pt-5 pb-2">
           <h2 className="text-sm font-semibold text-slate-200">Movimentos recentes</h2>
-          <Link href="/gastos" className="text-xs font-medium text-emerald-400 hover:text-emerald-300">
-            Ver gastos
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/entradas" className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+              Ver entradas <ArrowUpRight className="h-3 w-3" />
+            </Link>
+            <span className="text-slate-600">·</span>
+            <Link href="/gastos" className="text-xs font-medium text-rose-400 hover:text-rose-300 flex items-center gap-1">
+              Ver gastos <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          </div>
         </div>
         <RecentList items={recent} customCategories={overview.customCategories} />
       </Card>

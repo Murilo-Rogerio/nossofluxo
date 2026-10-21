@@ -5,6 +5,7 @@ import { MonthPicker } from '@/components/ui/month-picker'
 import { StatCard } from '@/components/ui/stat-card'
 import { IncomeFormCard } from '@/components/incomes/income-form-card'
 import { IncomeList } from '@/components/incomes/income-list'
+import { ExportDataButton } from '@/components/dashboard/export-data-button'
 import { getMonthlyOverview } from '@/lib/data'
 import { currentMonthKey, isValidMonthKey, monthTitle } from '@/lib/date'
 import { formatBRL } from '@/lib/format'
@@ -22,7 +23,7 @@ export default async function IncomesPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-slate-100">Entradas</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-100">Entradas</h1>
           <p className="mt-0.5 text-sm text-slate-500">{monthTitle(monthKey)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -31,6 +32,12 @@ export default async function IncomesPage({ searchParams }: PageProps) {
               <Sparkles className="h-3 w-3" />Projeção
             </span>
           )}
+          <ExportDataButton
+            monthKey={monthKey}
+            incomeItems={overview.incomeItems}
+            expenseItems={overview.expenseItems}
+            customCategories={overview.customCategories}
+          />
           <MonthPicker monthKey={monthKey} />
         </div>
       </div>
@@ -51,9 +58,11 @@ export default async function IncomesPage({ searchParams }: PageProps) {
 
       <IncomeFormCard />
 
-      <Card>
-        <h2 className="px-5 pt-5 text-sm font-semibold text-slate-200">Lançamentos do mês</h2>
-        <div className="mt-3">
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-1">
+          <h2 className="text-sm font-semibold text-slate-200">Lançamentos do mês</h2>
+        </div>
+        <div className="mt-2">
           <IncomeList items={overview.incomeItems} />
         </div>
       </Card>
