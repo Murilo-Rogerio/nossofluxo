@@ -4,9 +4,12 @@
 [![Framework](https://img.shields.io/badge/Next.js-15%20App%20Router-black?logo=nextdotjs&style=flat-square)]()
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue?logo=typescript&style=flat-square)]()
 [![Banco](https://img.shields.io/badge/Supabase-PostgreSQL%20%7C%20RLS-3ECF8E?logo=supabase&style=flat-square)]()
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel&style=flat-square)](https://nossofluxo.vercel.app)
 [![Licença](https://img.shields.io/badge/Licen%C3%A7a-MIT-violet?style=flat-square)]()
 
 Aplicação full-stack para gestão de finanças pessoais e controle patrimonial completo: entradas, gastos, parcelamentos inteligentes, patrimônio e investimentos — com cotações automáticas de CDI em tempo real via BrasilAPI, monitoramento de ações e FIIs via brapi.dev, e arquitetura preparada para Open Finance.
+
+🔗 **Acesse o app ao vivo:** [nossofluxo.vercel.app](https://nossofluxo.vercel.app)
 
 ---
 
