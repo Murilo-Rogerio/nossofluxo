@@ -13,6 +13,24 @@ Aplicação full-stack para gestão de finanças pessoais e controle patrimonial
 
 ---
 
+## 📑 Sumário
+
+- [Visão Geral](#-visão-geral)
+- [Funcionalidades](#-funcionalidades)
+- [Stack Tecnológica](#-stack-tecnológica)
+- [Arquitetura e Decisões Técnicas](#-arquitetura-e-decisões-técnicas)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Como Executar Localmente](#-como-executar-localmente)
+- [Licença](#-licença)
+
+---
+
+## 🧭 Visão Geral
+
+O **Nosso Fluxo** foi concebido para eliminar a fricção de planilhas financeiras estáticas e oferecer um ecossistema unificado para controle patrimonial. A aplicação calcula projeções patrimoniais futuras com juros compostos, monitora taxas de mercado em tempo real e entrega controle orçamentário completo com segurança em nível de banco de dados (RLS).
+
+---
+
 ## ⚡ Funcionalidades
 
 ### 🔐 Autenticação (Supabase Auth)
